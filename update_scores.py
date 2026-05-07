@@ -155,6 +155,22 @@ def main():
         print(f"Erreur API NHL: {e}", file=sys.stderr)
         sys.exit(1)
 
+    # DEBUG — structure de la réponse API
+    print(f"\nClés racine API: {list(data.keys())}")
+    rounds = data.get('rounds', [])
+    print(f"Nombre de rounds: {len(rounds)}")
+    for r in rounds:
+        rnum = r.get('roundNumber', r.get('round', '?'))
+        series_list = r.get('series', [])
+        print(f"  Round {rnum}: {len(series_list)} série(s)")
+        for s in series_list:
+            t1 = s.get('topSeedTeam', {}).get('abbrev', '?')
+            t2 = s.get('bottomSeedTeam', {}).get('abbrev', '?')
+            w1 = s.get('topSeedWins', '?')
+            w2 = s.get('bottomSeedWins', '?')
+            status = s.get('seriesStatus', '?')
+            print(f"    {t1} {w1}–{w2} {t2}  [{status}]  keys={list(s.keys())[:6]}")
+
     series = parse_r2_series(data)
     print(f"\nSéries R2 trouvées: {len(series)}")
 
