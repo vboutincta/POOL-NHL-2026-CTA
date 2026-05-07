@@ -51,28 +51,33 @@ def fetch_bracket():
 
 
 def parse_r2_series(data):
-    """Extrait les séries du 2e tour depuis la réponse de l'API NHL."""
+    """Extrait les séries du 2e tour depuis la réponse de l'API NHL.
+    Les séries sont dans data['series'] avec seriesAbbrev == 'R2'.
+    """
     results = {}
-    rounds = data.get('rounds', [])
-    for rnd in rounds:
-        if rnd.get('roundNumber') != 2:
+    all_series = data.get('series', [])
+    for series in all_series:
+        if series.get('seriesAbbrev') != 'R2':
             continue
-        for series in rnd.get('series', []):
-            t1 = series.get('topSeedTeam', {}).get('abbrev', '')
-            t2 = series.get('bottomSeedTeam', {}).get('abbrev', '')
-            if not t1 or not t2:
-                continue
-            s1 = series.get('topSeedWins', 0) or 0
-            s2 = series.get('bottomSeedWins', 0) or 0
-            status = series.get('seriesStatus', '')
-            winner = None
-            if status == 'topSeedWon':
+        t1_info = series.get('topSeedTeam', {})
+        t2_info = series.get('bottomSeedTeam', {})
+        t1 = t1_info.get('abbrev', '')
+        t2 = t2_info.get('abbrev', '')
+        if not t1 or not t2:
+            continue
+        s1 = series.get('topSeedWins', 0) or 0
+        s2 = series.get('bottomSeedWins', 0) or 0
+        # Déterminer le gagnant via winningTeamId
+        winning_id = series.get('winningTeamId')
+        winner = None
+        if winning_id:
+            if t1_info.get('id') == winning_id:
                 winner = t1
-            elif status == 'bottomSeedWon':
+            elif t2_info.get('id') == winning_id:
                 winner = t2
-            key = frozenset([t1, t2])
-            results[key] = {'t1': t1, 't2': t2, 's1': s1, 's2': s2, 'w': winner}
-            print(f"  {t1} {s1}–{s2} {t2}  winner={winner or 'en cours'}")
+        key = frozenset([t1, t2])
+        results[key] = {'t1': t1, 't2': t2, 's1': s1, 's2': s2, 'w': winner}
+        print(f"  {t1} {s1}–{s2} {t2}  winner={winner or 'en cours'}")
     return results
 
 
