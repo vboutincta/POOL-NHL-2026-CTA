@@ -2,7 +2,7 @@ name: Update NHL Scores
 
 on:
   schedule:
-    - cron: '0 7 * * *'  # 3h AM EDT (UTC-4, donc 7h UTC)
+    - cron: '23 5 * * *'  # 1h23 AM EDT (UTC-4, donc 5h23 UTC) — heure off-peak pour fiabilité
   workflow_dispatch:      # Permet aussi un déclenchement manuel depuis GitHub
 
 jobs:
@@ -10,7 +10,6 @@ jobs:
     runs-on: ubuntu-latest
     permissions:
       contents: write
-
     steps:
       - name: Checkout repo
         uses: actions/checkout@v4
