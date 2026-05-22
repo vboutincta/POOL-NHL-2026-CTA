@@ -43,26 +43,13 @@ SERIES2_KEY_MAP = {
 }
 
 # ── R3 : Finales de conférence ────────────────────────────────────────────────
-# Ces équipes seront connues dynamiquement une fois R2 terminé.
-# On mappe sur la conférence pour savoir quel objet cf mettre à jour.
-# L'équipe Ouest gagne automatiquement la place "west.cf" etc.
-# On détecte la conf via le bracket R2 : les gagnants de west → west.cf
-
-R3_BRACKET_CONF = {
-    # Sera résolu dynamiquement à partir des gagnants R2 dans le bracket
-    # On garde un fallback hardcodé basé sur les résultats actuels
-    frozenset(['COL', 'VGK']): 'west',
-    frozenset(['MTL', 'CAR']): 'east',
-}
-
-FC_SERIES_KEY_MAP = {
-    frozenset(['COL', 'VGK']): 'fc_ouest',
-    frozenset(['MTL', 'CAR']): 'fc_est',
-}
+# L'API NHL utilise 'WCF' (Western Conference Final) et 'ECF' (Eastern).
+# On détermine la conf directement depuis l'abréviation, pas des équipes.
+R3_ABBREVS = {'WCF', 'ECF'}
 
 # ── R4 : Finale de la Coupe Stanley ──────────────────────────────────────────
-# L'API NHL peut utiliser 'R4' ou 'SCF' — on accepte les deux.
-R4_ABBREVS = {'R4', 'SCF'}
+# L'API NHL utilise 'SCF' (Stanley Cup Final). Confirmé dans les logs.
+R4_ABBREVS = {'SCF'}
 
 
 # ─────────────────────────────────────────────────────────────────────────────
@@ -103,9 +90,9 @@ def parse_series_by_abbrev(data, target_abbrevs):
                 winner = t1
             elif t2_info.get('id') == winning_id:
                 winner = t2
+        abbrev = series.get('seriesAbbrev', '')
         key = frozenset([t1, t2])
-        results[key] = {'t1': t1, 't2': t2, 's1': s1, 's2': s2, 'w': winner}
-        abbrev = series.get('seriesAbbrev')
+        results[key] = {'t1': t1, 't2': t2, 's1': s1, 's2': s2, 'w': winner, 'abbrev': abbrev}
         print(f"  [{abbrev}] {t1} {s1}–{s2} {t2}  winner={winner or 'en cours'}")
     return results
 
@@ -411,8 +398,8 @@ def main():
     print("\n--- Séries R2 ---")
     r2_series = parse_series_by_abbrev(data, 'R2')
 
-    print("\n--- Séries R3 ---")
-    r3_series = parse_series_by_abbrev(data, 'R3')
+    print("\n--- Séries R3 (WCF/ECF) ---")
+    r3_series = parse_series_by_abbrev(data, R3_ABBREVS)
 
     print("\n--- Séries R4/SCF ---")
     r4_series = parse_series_by_abbrev(data, R4_ABBREVS)
@@ -440,23 +427,30 @@ def main():
             if ok:
                 print(f"  Series2 mis à jour: {s2_key}")
 
-    # ── R3 ────────────────────────────────────────────────────────────────────
+    # ── R3 (WCF / ECF) ───────────────────────────────────────────────────────
     print(f"\nSéries R3 trouvées: {len(r3_series)}")
     for key, info in r3_series.items():
         t1, t2, s1, s2, winner = info['t1'], info['t2'], info['s1'], info['s2'], info['w']
+        abbrev = info.get('abbrev', '')
 
-        # Détecter la conf : d'abord via table hardcodée, puis via le HTML
-        conf = R3_BRACKET_CONF.get(key) or detect_r3_conf(key, html)
-        if not conf:
-            print(f"  AVERTISSEMENT: conf indéterminée pour {t1}/{t2} — skipping bracket cf", file=sys.stderr)
+        # Conf déduite directement de l'abréviation API (WCF=west, ECF=east)
+        if abbrev == 'WCF':
+            conf, fc_key = 'west', 'fc_ouest'
+        elif abbrev == 'ECF':
+            conf, fc_key = 'east', 'fc_est'
         else:
-            html, ok = update_bracket_cf(html, conf, t1, t2, s1, s2, winner)
-            if ok:
-                print(f"  Bracket CF ({conf}) mis à jour: {t1} {s1}–{s2} {t2}")
+            # Fallback : détecter via les gagnants R2 dans le HTML
+            conf = detect_r3_conf(key, html)
+            fc_key = ('fc_ouest' if conf == 'west' else 'fc_est') if conf else None
 
-        fc_key = FC_SERIES_KEY_MAP.get(key)
-        if not fc_key and conf:
-            fc_key = 'fc_ouest' if conf == 'west' else 'fc_est'
+        if not conf:
+            print(f"  AVERTISSEMENT: conf indéterminée pour {t1}/{t2} [{abbrev}] — skipping", file=sys.stderr)
+            continue
+
+        html, ok = update_bracket_cf(html, conf, t1, t2, s1, s2, winner)
+        if ok:
+            print(f"  Bracket CF ({conf}/{abbrev}) mis à jour: {t1} {s1}–{s2} {t2}")
+
         if fc_key:
             html, ok = update_fc_series(html, fc_key, s1, s2, winner)
             if ok:
