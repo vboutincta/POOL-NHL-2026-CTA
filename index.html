@@ -879,7 +879,7 @@ footer {
     </div>
     <div class="header-meta">
       <div class="phase-badge" id="phase-badge">Phase 1 — Tour 1 terminé</div>
-      <div class="last-update" id="last-update">Mis à jour le mai 21, 2026 à 20:51 EDT</div>
+      <div class="last-update" id="last-update">Mis à jour le mai 21, 2026 à 21:01 EDT</div>
     </div>
   </div>
 </header>
@@ -949,7 +949,7 @@ footer {
 </main>
 
 <footer>
-  Pool NHL 2026 · CTA Cabinet Comptable · Mis à jour le <span id="footer-date">Mis à jour le mai 21, 2026 à 20:51 EDT</span>
+  Pool NHL 2026 · CTA Cabinet Comptable · Mis à jour le <span id="footer-date">Mis à jour le mai 21, 2026 à 21:01 EDT</span>
 </footer>
 
 <script>
@@ -958,7 +958,7 @@ footer {
 // ════════════════════════════════════════════════════════════════
 const POOL = {
   updated: "2026-05-21",
-  phase: "Phase 3 — Finales de Conférence à venir",
+  phase: "Phase 3 — Finales de Conférence en cours",
 
   series: [
     { key:"est_buf_bos",   label:"BUF vs BOS",   full:"Buffalo Sabres vs Boston Bruins",          conf:"EST",   winner:"BUF", matchs:6 },
@@ -977,14 +977,14 @@ const POOL = {
         { label:'DF Ouest 1', r1:[{t1:'COL',s1:4,t2:'LAK',s2:0,w:'COL'},{t1:'DAL',s1:2,t2:'MIN',s2:4,w:'MIN'}], r2:{t1:'COL',s1:4,t2:'MIN',s2:1,w:'COL'} },
         { label:'DF Ouest 2', r1:[{t1:'VGK',s1:4,t2:'UTA',s2:2,w:'VGK'},{t1:'EDM',s1:2,t2:'ANA',s2:4,w:'ANA'}], r2:{t1:'VGK',s1:4,t2:'ANA',s2:2,w:'VGK'} },
       ],
-      cf: { t1:null, s1:0, t2:null, s2:0, w:null },
+      cf: { t1:'COL', s1:0, t2:'VGK', s2:1, w:null },
     },
     east: {
       arms: [
         { label:'DF Est 1', r1:[{t1:'BUF',s1:4,t2:'BOS',s2:2,w:'BUF'},{t1:'TBL',s1:3,t2:'MTL',s2:4,w:'MTL'}], r2:{t1:'BUF',s1:3,t2:'MTL',s2:4,w:'MTL'} },
         { label:'DF Est 2', r1:[{t1:'CAR',s1:4,t2:'OTT',s2:0,w:'CAR'},{t1:'PIT',s1:2,t2:'PHI',s2:4,w:'PHI'}], r2:{t1:'CAR',s1:4,t2:'PHI',s2:0,w:'CAR'} },
       ],
-      cf: { t1:null, s1:0, t2:null, s2:0, w:null },
+      cf: { t1:'CAR', s1:0, t2:'MTL', s2:0, w:null },
     },
     final: { t1:null, s1:0, t2:null, s2:0, w:null },
   },
@@ -997,7 +997,7 @@ const POOL = {
   ],
   fcSeries: [
     { key:'fc_est',   label:'FC Est',   full:'Finale de Conférence Est',   conf:'EST',   score:'0–0', winner:null, matchs:null },
-    { key:'fc_ouest', label:'FC Ouest', full:'Finale de Conférence Ouest', conf:'OUEST', score:'0–0', winner:null, matchs:null },
+    { key:'fc_ouest', label:'FC Ouest', full:'Finale de Conférence Ouest', conf:'OUEST', score:'0–1', winner:null, matchs:1 },
   ],
   finalSeries: [
     { key:'sc_final', label:'Grande finale', full:'Stanley Cup Final', winner:null, matchs:null },
