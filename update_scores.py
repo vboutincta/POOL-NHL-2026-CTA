@@ -79,7 +79,7 @@ def parse_series_by_abbrev(data, target_abbrevs):
         t2_info = series.get('bottomSeedTeam', {})
         t1 = t1_info.get('abbrev', '')
         t2 = t2_info.get('abbrev', '')
-        if not t1 or not t2:
+        if not t1 or not t2 or t1 in {'TBD', 'TBA'} or t2 in {'TBD', 'TBA'}:
             continue
         s1 = series.get('topSeedWins', 0) or 0
         s2 = series.get('bottomSeedWins', 0) or 0
